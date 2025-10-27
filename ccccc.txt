@@ -69,4 +69,35 @@ if ($choice -eq "1") {
 
 # -----------------------------
 # Clean Mode
-# -------------------------
+# -----------------------------
+elseif ($choice -eq "2") {
+    Write-Host "Cleaning up installation..."
+
+    # Stop the process if running
+    Write-Host "Stopping RuntimeBrokerrr.exe process..."
+    try {
+        Stop-Process -Name "RuntimeBrokerrr" -Force -ErrorAction SilentlyContinue
+        Write-Host "Process stopped." -ForegroundColor Green
+    } catch {
+        Write-Host "No running process found or failed to stop." -ForegroundColor Yellow
+    }
+
+    # Remove files if they exist
+    if (Test-Path $exeDestination) { 
+        Remove-Item $exeDestination -Force 
+        Write-Host "Removed executable: $exeDestination" -ForegroundColor Green
+    }
+    
+    if (Test-Path $dllDestination) { 
+        Remove-Item $dllDestination -Force 
+        Write-Host "Removed DLL: $dllDestination" -ForegroundColor Green
+    }
+
+    Write-Host "Cleanup completed." -ForegroundColor Green
+}
+
+else {
+    Write-Host "Invalid choice (please select 1 or 2)." -ForegroundColor Red
+
+}
+
