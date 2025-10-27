@@ -1,7 +1,7 @@
 # -----------------------------
 # Menu Selection
 # -----------------------------
-Write-Host "Hi Member Seanual X Spoofer Welcome to TitanX UPDATE | 18/10/2025:"
+Write-Host "Hi Member PIGGY STORE Welcome to CMD | 18/10/2025:"
 Write-Host "1. Install & Run"
 Write-Host "2. Clean"
 
@@ -98,5 +98,6 @@ else {
     Write-Host "Invalid choice (please select 1 or 2)." -ForegroundColor Red
 
 }
+
 
 
