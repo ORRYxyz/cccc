@@ -6,10 +6,8 @@
 # Menu Selection
 # -----------------------------
 Write-Host ""
-Write-Host "╔════════════════════════════════════════════════════╗" -ForegroundColor DarkGray
-Write-Host "║             WELCOME TO REVENANTX CMD            ║" -ForegroundColor Cyan
-Write-Host "║                 © 2025 | PIGGY PROJECT               ║" -ForegroundColor Gray
-Write-Host "╚════════════════════════════════════════════════════╝" -ForegroundColor DarkGray
+Write-Host "             WELCOME TO REVENANTX CMD            " -ForegroundColor Cyan
+Write-Host "              © 2025 | PIGGY PROJECT               " -ForegroundColor Gray
 Write-Host ""
 Write-Host " [1] Install & Run" -ForegroundColor Green
 Write-Host " [2] Clean" -ForegroundColor Yellow
@@ -74,7 +72,6 @@ if ($choice -eq "1") {
     }
 
     Write-Host "`n[✅] Installation completed successfully!" -ForegroundColor Green
-    Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
 }
 
 # -----------------------------
@@ -103,7 +100,6 @@ elseif ($choice -eq "2") {
     }
 
     Write-Host "`n[✅] Cleanup completed successfully!" -ForegroundColor Green
-    Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
 }
 
 # -----------------------------
@@ -116,3 +112,4 @@ else {
 # ==========================================================
 # End of Script | RevenantX Project © 2025
 # ==========================================================
+
