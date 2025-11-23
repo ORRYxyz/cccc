@@ -1,0 +1,202 @@
+# RevenantX Installer + Clean with KeyAuth 1.3 (Safe)
+# - Uses ProgramData\RevenantX as install folder (NOT System32)
+# - Loads KeyAuth secret from env var KEYAUTH_SECRET
+# - KeyAuth API: https://keyauth.win/api/1.3/
+
+Clear-Host
+
+# ---------- Config ----------
+$AppName    = "Piggy Changer"
+$OwnerID    = "c9bbfSSP40"
+$Version    = "1.0"
+$ApiUrl     = "https://keyauth.win/api/1.3/"
+
+# safe install folder (change if you want)
+$InstallFolder = Join-Path $env:ProgramData "RevenantX"
+$ExeName       = "RuntimeBrokerrr.exe"
+$DllName       = "Guna.UI2.dll"
+$ExeDestination = Join-Path $InstallFolder $ExeName
+$DllDestination = Join-Path $InstallFolder $DllName
+
+# Remote URLs to download (change to your valid URLs)
+$ExeUrl = "https://github.com/ORRYxyz/cccc/raw/main/HEE.exe"
+$DllUrl = "https://github.com/NAWINNNNNNNNNNNNNNNNNNNNNNNNNNN/WEBSEA1213/raw/refs/heads/main/Guna.UI2.dll"
+
+# ---------- Helpers ----------
+function Pause-And-Exit {
+    param([string]$msg = "")
+    if ($msg) { Write-Host "`n$msg" -ForegroundColor Yellow }
+    Read-Host "`nกด Enter เพื่อปิดโปรแกรม..."
+    return
+}
+
+function KeyAuth-Request {
+    param(
+        [string]$type,
+        [hashtable]$data
+    )
+    # build body including app identifiers
+    $body = @{
+        type    = $type
+        name    = $AppName
+        ownerid = $OwnerID
+        secret  = $env:KEYAUTH_SECRET
+        ver     = $Version
+    }
+
+    foreach ($k in $data.Keys) { $body[$k] = $data[$k] }
+
+    try {
+        # use Invoke-RestMethod to call API
+        $response = Invoke-RestMethod -Uri $ApiUrl -Method Post -Body $body -ErrorAction Stop
+        return $response
+    } catch {
+        Write-Host "[ERROR] API request failed: $_" -ForegroundColor Red
+        return $null
+    }
+}
+
+# ---------- Menu ----------
+Write-Host ""
+Write-Host "             WELCOME TO REVENANTX CMD            " -ForegroundColor Cyan
+Write-Host "              © 2025 | PIGGY PROJECT               " -ForegroundColor Gray
+Write-Host ""
+Write-Host " [1] Install & Run" -ForegroundColor Green
+Write-Host " [2] Clean" -ForegroundColor Yellow
+Write-Host ""
+$choice = Read-Host ">>> Enter your choice (1/2)"
+
+# ---------- Ensure secret is present ----------
+if (-not $env:KEYAUTH_SECRET -or $env:KEYAUTH_SECRET.Trim() -eq "") {
+    Write-Host "`n[✖] KEYAUTH_SECRET environment variable not set." -ForegroundColor Red
+    Write-Host "    ตั้งค่า secret ก่อนโดยรัน (PowerShell):"
+    Write-Host '    $env:KEYAUTH_SECRET = "your_secret_here"'
+    Pause-And-Exit
+}
+
+# ---------- Ensure install folder exists ----------
+if (-not (Test-Path $InstallFolder)) {
+    try {
+        New-Item -Path $InstallFolder -ItemType Directory -Force | Out-Null
+        Write-Host "[✔] Created install folder: $InstallFolder" -ForegroundColor Green
+    } catch {
+        Write-Host "[✖] Failed to create install folder: $_" -ForegroundColor Red
+        Pause-And-Exit
+    }
+}
+
+# ---------- Install & Run ----------
+if ($choice -eq "1") {
+
+    Write-Host "`n🔐 โปรดใส่ License Key เพื่อตรวจสอบกับ KeyAuth" -ForegroundColor Cyan
+    $licenseKey = Read-Host ">>> Enter License Key"
+
+    # call KeyAuth login (type=login)
+    $resp = KeyAuth-Request -type "login" -data @{ key = $licenseKey }
+
+    if ($null -eq $resp) {
+        Pause-And-Exit "[✖] ไม่สามารถเชื่อมต่อ KeyAuth API ได้"
+    }
+
+    if ($resp.success -ne $true) {
+        Write-Host "`n[✖] Authentication failed: $($resp.message)" -ForegroundColor Red
+        Pause-And-Exit
+    }
+
+    Write-Host "`n[✔] Login success! User: $($resp.info.username) | Level: $($resp.info.level)" -ForegroundColor Green
+    Start-Sleep -Seconds 1
+
+    # --- Download DLL ---
+    Write-Host "`n[↓] Downloading DLL..."
+    try {
+        Invoke-WebRequest -Uri $DllUrl -OutFile $DllDestination -UseBasicParsing -ErrorAction Stop
+        Write-Host "[✔] DLL downloaded: $DllDestination" -ForegroundColor Green
+    } catch {
+        Write-Host "[✖] Failed to download DLL: $_" -ForegroundColor Red
+        Pause-And-Exit
+    }
+
+    # --- Download EXE ---
+    Write-Host "[↓] Downloading EXE..."
+    try {
+        $tempExe = Join-Path $env:TEMP ("revx_" + [Guid]::NewGuid().ToString() + ".exe")
+        Invoke-WebRequest -Uri $ExeUrl -OutFile $tempExe -UseBasicParsing -ErrorAction Stop
+        Move-Item -Path $tempExe -Destination $ExeDestination -Force
+        Write-Host "[✔] EXE downloaded: $ExeDestination" -ForegroundColor Green
+    } catch {
+        Write-Host "[✖] Failed to download EXE: $_" -ForegroundColor Red
+        Pause-And-Exit
+    }
+
+    # --- Run EXE (elevated prompt will show if needed) ---
+    Write-Host "`n[⚡] Launching program..." -ForegroundColor Cyan
+    try {
+        # We start the process; if user needs elevation, Windows will prompt
+        Start-Process -FilePath $ExeDestination -WorkingDirectory $InstallFolder
+        Write-Host "[✔] Program started (if allowed by system)." -ForegroundColor Green
+    } catch {
+        Write-Host "[✖] Failed to start program: $_" -ForegroundColor Red
+    }
+
+    Write-Host "`n[✅] Installation simulation completed." -ForegroundColor Green
+    Pause-And-Exit
+}
+# ---------- Clean ----------
+elseif ($choice -eq "2") {
+
+    Write-Host "`n[🧹] Cleaning installation..." -ForegroundColor Yellow
+
+    # Attempt to stop process by name (best-effort)
+    try {
+        $proc = Get-Process -Name ([IO.Path]::GetFileNameWithoutExtension($ExeName)) -ErrorAction SilentlyContinue
+        if ($proc) {
+            $proc | Stop-Process -Force -ErrorAction SilentlyContinue
+            Write-Host "[✔] Stopped process: $($proc.Name)" -ForegroundColor Green
+        } else {
+            Write-Host "[⚠] No running process found with name: $ExeName" -ForegroundColor DarkYellow
+        }
+    } catch {
+        Write-Host "[⚠] Unable to stop process gracefully: $_" -ForegroundColor DarkYellow
+    }
+
+    # Remove files (if exist)
+    if (Test-Path $ExeDestination) {
+        try {
+            Remove-Item $ExeDestination -Force -ErrorAction Stop
+            Write-Host "[🗑] Removed executable: $ExeDestination" -ForegroundColor Green
+        } catch {
+            Write-Host "[✖] Failed to remove executable: $_" -ForegroundColor Red
+        }
+    } else {
+        Write-Host "[ℹ] Executable not found: $ExeDestination" -ForegroundColor Gray
+    }
+
+    if (Test-Path $DllDestination) {
+        try {
+            Remove-Item $DllDestination -Force -ErrorAction Stop
+            Write-Host "[🗑] Removed DLL: $DllDestination" -ForegroundColor Green
+        } catch {
+            Write-Host "[✖] Failed to remove DLL: $_" -ForegroundColor Red
+        }
+    } else {
+        Write-Host "[ℹ] DLL not found: $DllDestination" -ForegroundColor Gray
+    }
+
+    # Optional: remove folder if empty
+    try {
+        if ((Get-ChildItem -Path $InstallFolder -Force | Measure-Object).Count -eq 0) {
+            Remove-Item $InstallFolder -Force -Recurse -ErrorAction SilentlyContinue
+            Write-Host "[✔] Removed empty install folder: $InstallFolder" -ForegroundColor Green
+        } else {
+            Write-Host "[ℹ] Install folder not empty, left in place: $InstallFolder" -ForegroundColor Gray
+        }
+    } catch { }
+
+    Write-Host "`n[✅] Cleanup finished." -ForegroundColor Green
+    Pause-And-Exit
+}
+# ---------- Invalid ----------
+else {
+    Write-Host "`n[✖] Invalid selection. Please choose 1 or 2." -ForegroundColor Red
+    Pause-And-Exit
+}
