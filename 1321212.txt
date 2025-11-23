@@ -70,7 +70,7 @@ $choice = Read-Host ">>> Enter your choice (1/2)"
 if (-not $env:KEYAUTH_SECRET -or $env:KEYAUTH_SECRET.Trim() -eq "") {
     Write-Host "`n[✖] KEYAUTH_SECRET environment variable not set." -ForegroundColor Red
     Write-Host "    ตั้งค่า secret ก่อนโดยรัน (PowerShell):"
-    Write-Host '    $env:KEYAUTH_SECRET = "your_secret_here"'
+    Write-Host '    $env:KEYAUTH_SECRET = "42ac950133d2a83a894c2a3536ae9f8116564220a29ccbb5e31d7cf22678482b"'
     Pause-And-Exit
 }
 
@@ -200,3 +200,4 @@ else {
     Write-Host "`n[✖] Invalid selection. Please choose 1 or 2." -ForegroundColor Red
     Pause-And-Exit
 }
+
